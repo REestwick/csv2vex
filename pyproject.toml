@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "csv2vex"
+version = "0.1.0"
+description = "CLI to convert csv to cyclonedx VEX documents"
+authors = ["Richard Estwick <restwick@cybeats.com>", "Cybeats Technologies <cs@cybeats.com"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pandas = "^2.2.2"
+cyclonedx-python-lib = "^7.6.0"
+openpyxl = "^3.1.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+csv2vex = "csv2vex.__main__:main"

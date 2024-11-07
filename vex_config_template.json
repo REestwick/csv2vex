@@ -1,0 +1,89 @@
+{
+    "bom_ref": null,
+    "id": null,
+    "source": {
+        "url": null,
+        "name": null
+    },
+    "references": [
+        {
+            "id": null,
+            "source": {
+                "url": null,
+                "name": null
+            }
+        }
+    ],
+    "ratings": [
+        {
+            "source": {
+                "url": null,
+                "name": null
+            },
+            "score": null,
+            "severity": null,
+            "method": null,
+            "vector": null,
+            "justification": null
+        }
+    ],
+    "cwes": null,
+    "description": null,
+    "detail": null,
+    "recommendation": null,
+    "workaround": null,
+    "advisories": [
+        {
+            "title": null,
+            "url": null
+        }
+    ],
+    "created": null,
+    "published": null,
+    "updated": null,
+    "rejected": null,
+    "credits": {
+        "organizations": [
+            {
+                "bom-ref": null,
+                "name": null,
+                "urls": null,
+                "contact": [
+                    {
+                        "bom-ref": null,
+                        "name": null,
+                        "email": null,
+                        "phone": null
+                    }
+                ]
+            }
+        ],
+        "individuals": [
+            {
+                "bom-ref": null,
+                "name": null,
+                "email": null,
+                "phone": null
+            }
+        ]
+    },
+    "tools": [
+        {
+            "name": null,
+            "version": null
+        }
+    ],
+    "analysis": {
+        "state": null,
+        "justification": null,
+        "detail": null,
+        "response": []
+    },
+    "affects": [
+        {
+            "ref": null,
+            "versions": []
+        }
+    ],
+    "properties": []
+}

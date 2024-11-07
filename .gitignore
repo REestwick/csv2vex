@@ -1,0 +1,8 @@
+csv2vex/__pycache__
+tests/__pycache__
+.ruff_cache
+config.json
+tests/example/config.json
+.vscode/
+bom.cdx.json
+vex.json
