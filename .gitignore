@@ -6,3 +6,4 @@ tests/example/config.json
 .vscode/
 bom.cdx.json
 vex.json
+dist/

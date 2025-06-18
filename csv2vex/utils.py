@@ -12,7 +12,7 @@ from datetime import datetime
 import csv2vex
 import numpy as np
 import decimal
-
+from packageurl import PackageURL
 
 default_filename = "vex_config_template.json"
 date_format = '%m/%d/%Y'
@@ -122,10 +122,10 @@ def read_file(data_file:str) -> tuple[int, pd.DataFrame]:
     if not filepath.exists():
         err = -1
     elif ext in ['.csv']:
-        data = pd.read_csv(filepath)
+        data = pd.read_csv(filepath, dtype=str)
         data = data.replace(np.nan, None)
     elif ext in ['.xls', '.xlsx']:
-        data = pd.read_excel(filepath)
+        data = pd.read_excel(filepath, dtype=str)
         data = data.replace(np.nan, None)
     else:
         err = 1
@@ -241,6 +241,8 @@ def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
     #affects
     if ref_config := config_data.get("affects"):
         affects = [get_affect(csv_data, ref) for ref in ref_config]
+        if any(affects):
+            affects = [i for j in affects for i in j]
         affects = [i for i in affects if i is not None]
         vulnerability.affects = affects
 
@@ -368,20 +370,65 @@ def get_advisory(csv_data:pd.Series, config_data:dict) -> VulnerabilityAdvisory|
     else:
         return None
     
-def get_affect(csv_data:pd.Series, config_data:dict) ->BomTarget|None:
+'''
+Check if reference string is PURL. 
+Then check if PURL is complete. 
+If not, garnish PURL with added version information.
+Else, continue as normal.
+'''
+def get_affect(csv_data:pd.Series, config_data:dict) ->list[BomTarget]|None:
+    
+    is_flawed_purl = False
+    refpurl = None
+
     ref = get_val('ref', csv_data, config_data)
+    try:
+        refpurl = PackageURL.from_string(ref)
+        if not refpurl.version:
+            is_flawed_purl = True
+    except:
+        reference = ref
+
+    reference = ref
+   
     ver_list = config_data.get('versions')
     ver_dict_list = [{'version':ver} for ver in ver_list]
 
     versions = [get_val('version', csv_data, ver) for ver in ver_dict_list]
     versions = [ver for ver in versions if ver is not None]
-    versions = [BomTargetVersionRange(version=ver) for ver in versions] if any(versions) else None
+    versions_list = [BomTargetVersionRange(version=ver) for ver in versions] if any(versions) else None
 
+    
+    if is_flawed_purl:
+        if versions_list and len(versions_list) > 0:
+            target_list = []
+            for ver in versions_list:
+                new_ref_purl = str(
+                                    PackageURL(
+                                        type=refpurl.type, 
+                                        namespace=refpurl.namespace, 
+                                        name=refpurl.name, 
+                                        version=ver.version
+                                        )
+                                )
+                
+
+                target_list.append(BomTarget(ref=new_ref_purl, versions=[ver]))
+
+            return target_list if len(target_list) > 0 else None
+        else:
+            new_ref_purl = str(
+                                    PackageURL(
+                                        type=refpurl.type, 
+                                        namespace=refpurl.namespace, 
+                                        name=refpurl.name, 
+                                        version= "0"
+                                        )
+                                )
+            return [BomTarget(ref=new_ref_purl)]
+           
     if ref:
-        return BomTarget(
-            ref=ref,
-            versions=versions
-        )
+        return [BomTarget(ref=reference,versions=versions_list)]
     else:
         return None
 
