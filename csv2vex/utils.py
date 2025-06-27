@@ -175,7 +175,7 @@ def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
             justification = None
         responses = []
         try:
-            res_list = res.get('responses')
+            res_list = res.get('response')
             for i in res_list:
                 try:
                     response = csv_data.get(i)
