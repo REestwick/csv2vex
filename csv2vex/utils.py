@@ -16,6 +16,7 @@ from packageurl import PackageURL
 
 default_filename = "vex_config_template.json"
 date_format = '%m/%d/%Y'
+make_purl = False
 
 template = {
     'bom_ref':None,
@@ -103,12 +104,14 @@ template = {
                 {
                     'ref':None, 
                     'versions':[]
-                }
+                } if make_purl is False else {'ref': {'package':None, 'name':None, 'version':None}, 'versions':[]}
     ],
     'properties':[]
 }
 
-def create_template_file(filename:str|None) -> None:
+def create_template_file(filename:str|None, make_purl_bool:bool) -> None:
+    global make_purl
+    make_purl = make_purl_bool
     file_name = filename if filename is not None else default_filename
     print(f"creating config file {file_name}")
     config_file = Path(file_name)
@@ -153,6 +156,7 @@ def get_val(keyword:str, csv_data:pd.Series, config_data:dict) -> str | None:
     if type(key) is str:
         res = csv_data.get(key)
     return res
+
 
 def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
     vulnerability = Vulnerability()
@@ -371,6 +375,58 @@ def get_advisory(csv_data:pd.Series, config_data:dict) -> VulnerabilityAdvisory|
         return None
     
 '''
+Check is affects reference string is PURL
+If PURL with version, return 0 - good PURL
+If PURL without version, return 1 - flawed PURL
+If not PURL "Make PURL" set, return 2 - PURL to be made
+If not PURL and no "Make PURL", return 3 - Not a PURL
+'''
+def check_affect_ref(ref):
+    is_flawed_purl = 3
+    try:
+        result = PackageURL.from_string(ref)
+        is_flawed_purl = 1 if not result.version else 0 #if no PURL version, mark as flawed PURL
+    except:
+        is_flawed_purl = 2 if make_purl is True else 3
+
+    return is_flawed_purl
+
+def make_affect_purl(config_data:dict,ref:dict, versions:list[BomTargetVersionRange]) -> list[BomTarget]|None:
+    name = ref.get('name')
+    package = ref.get(key='package', default='generic')
+    version = ref.get(key='version', default='0')
+    if name:
+        purl_ref = [BomTarget(ref=PackageURL(type=package, name=name, version=version), versions=versions if len(versions) > 0 else version)]
+        return purl_ref
+    else:
+        return None
+    pass
+
+def correct_affect_purl(ref:str, versions:list[BomTargetVersionRange]) -> list[BomTarget]|None:
+    refpurl = PackageURL.from_string(ref)
+    if len(versions) > 0:
+        corrected_purls = [BomTarget(ref=PackageURL(type=refpurl.type, namespace=refpurl.namespace, name=refpurl.name, version=version.version), versions=version) for version in versions]
+    else:
+        corrected_purls = [BomTarget(ref=PackageURL(type=refpurl.type, namespace=refpurl.namespace, name=refpurl.name, version="0"))]
+    return corrected_purls
+
+def get_affect_2(csv_data:pd.Series, config_data:dict) ->list[BomTarget]|None:
+    ref = get_val('ref', csv_data, config_data)
+    ver_list = config_data.get('versions')
+    versions = [BomTargetVersionRange(version=csv_data.get(version)) for version in ver_list if csv_data.get(version) is not None]
+    bom_versions = []
+    ref_status = check_affect_ref(ref)
+    if ref_status == 0:
+        pass
+    elif ref_status == 1:
+        pass
+    elif ref_status == 2:
+        pass
+    else:
+        pass
+    pass
+    
+'''
 Check if reference string is PURL. 
 Then check if PURL is complete. 
 If not, garnish PURL with added version information.
@@ -504,6 +560,9 @@ def make_vex(values) -> None:
     file = values.get('f')
     config = values.get('c')
     output = values.get('o')
+
+    global make_purl
+    make_purl = values.get('mp')
 
     outfile = Path(output if output else 'vex.json')
 
