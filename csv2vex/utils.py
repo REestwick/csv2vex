@@ -129,6 +129,7 @@ def read_file(data_file:str) -> tuple[int, pd.DataFrame]:
         data = data.replace(np.nan, None)
     else:
         err = 1
+    data = data.apply(lambda x: x.str.strip())
     return err, data
 
 def read_config(json_file:str) -> tuple[int, dict]:

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "csv2vex"
-version = "0.1.2"
+version = "0.1.3"
 description = "CLI to convert csv to cyclonedx VEX documents"
 authors = ["Richard Estwick <restwick@cybeats.com>", "Cybeats Technologies <cs@cybeats.com"]
 readme = "README.md"
