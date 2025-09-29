@@ -8,7 +8,6 @@ import decimal
 from cyclonedx.model.impact_analysis import ImpactAnalysisState, ImpactAnalysisJustification
 from datetime import datetime
 from pprint import pprint
-import pytest
 
 def test_cwe():
     cwes_in = "[CWE-123, 456]"

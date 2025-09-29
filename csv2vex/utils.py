@@ -206,21 +206,6 @@ def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
             source = None
         vulnerability.source = source
     
-    #dates
-    if res := get_val("created", csv_data, config_data):
-        result = datetime.strptime(res, date_format)
-        setattr(vulnerability, "created", result)
-
-
-    if res := get_val("updated", csv_data, config_data):
-        result = datetime.strptime(res, date_format)
-        setattr(vulnerability, "updated", result)
-
-
-    if res := get_val("published", csv_data, config_data):
-        result = datetime.strptime(res, date_format)
-        setattr(vulnerability, "published", result)
-    
     #references
     if ref_config := config_data.get("references"):
         references = [get_reference(csv_data, ref) for ref in ref_config]
@@ -269,6 +254,29 @@ def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
     if ref_config := config_data.get('credits'):
         credits = get_credits(csv_data, ref_config)
         vulnerability.credits = credits
+
+    #dates
+    if vulnerability.created:
+        try:
+            created = datetime.fromisoformat(vulnerability.created)
+            vulnerability.created = created
+        except:
+            vulnerability.created = None
+    if vulnerability.published:
+        try:
+            published = datetime.fromisoformat(vulnerability.published)
+            vulnerability.published = published
+        except:
+            vulnerability.published = None
+            
+    if vulnerability.updated:
+        try:
+            updated = datetime.fromisoformat(vulnerability.updated)
+            vulnerability.updated = updated
+        except:
+            vulnerability.updated = None
+
+
 
     return vulnerability
 
