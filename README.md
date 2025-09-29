@@ -184,7 +184,7 @@ For array fields, the JSON object can be duplicated for each occurence e.g.:
 ##### Notes
 
 * CWEs must be in the format "[CWE-<integer>]" or "[<integer>]".
-* Dates corresponding to "created", "published", "updated", "rejected" must be in <dd/mm/yyyy> formatted strings.
+* Dates corresponding to "created", "published", "updated" must be in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html) formatted strings.
 
 #### Command Parameters
 

@@ -7,3 +7,5 @@ tests/example/config.json
 bom.cdx.json
 vex.json
 dist/
+example/
+run

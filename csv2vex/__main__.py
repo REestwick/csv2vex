@@ -2,7 +2,7 @@ import argparse
 import csv2vex
 from . import utils
 def main():
-    desc = f"csv2cdx v{csv2vex.__version__}"
+    desc = f"csv2vex v{csv2vex.__version__}"
     parser = argparse.ArgumentParser(description=desc)
     subparsers = parser.add_subparsers(dest='subcommand', required=False)
 
