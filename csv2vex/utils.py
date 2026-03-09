@@ -155,6 +155,12 @@ def get_val(keyword:str, csv_data:pd.Series, config_data:dict) -> str | None:
         res = csv_data.get(key)
     return res
 
+def normalize_analysis(value:str) -> str:
+    if type(value) is not str:
+        return None
+    normalized_value = value.strip().lower().replace(" ", "_")
+    return normalized_value
+
 def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
     vulnerability = Vulnerability()
     for key in template.keys():
@@ -166,11 +172,13 @@ def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
     if res := config_data.get("analysis"):
         try:
             state_str = get_val('state', csv_data, res)
+            state_str = normalize_analysis(state_str)
             state = ImpactAnalysisState(state_str)
         except:
             state = None
         try:
             jus_str = get_val('justification', csv_data, res)
+            jus_str = normalize_analysis(jus_str)
             justification = ImpactAnalysisJustification(jus_str)
         except:
             justification = None
@@ -179,7 +187,7 @@ def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
             res_list = res.get('response')
             for i in res_list:
                 try:
-                    response = csv_data.get(i)
+                    response = normalize_analysis(csv_data.get(i))
                     responses.append(ImpactAnalysisResponse(response))
                 except:
                     pass
