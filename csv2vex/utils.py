@@ -158,17 +158,28 @@ def get_val(keyword:str, csv_data:pd.Series, config_data:dict) -> str | None:
     return res
 
 def normalize_analysis(value:str) -> str:
+    status_mapping = {
+            "not_affected":"not_affected",
+            "affected":"exploitable",
+            "under_investigation":"in_triage",
+            "fixed":"resolved",
+            "false_positive":"false_positive"
+        }
     if type(value) is not str:
         return None
     normalized_value = value.strip().lower().replace(" ", "_")
-    return normalized_value
+    if normalized_value in status_mapping:
+        return status_mapping.get(normalized_value)
+    else:
+        return normalized_value
 
 def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
     vulnerability = Vulnerability()
     for key in template.keys():
         if hasattr(vulnerability, key) and type(key) is str and key != 'bom_ref': 
             res = get_val(key, csv_data, config_data)
-            setattr(vulnerability, key, res)
+            if type(res) is str:
+                setattr(vulnerability, key, res)
 
     #analysis
     if res := config_data.get("analysis"):
@@ -195,9 +206,13 @@ def get_vulnerability(csv_data:pd.Series, config_data:dict) -> Vulnerability:
                     pass
         except:
             responses = None
-        detail = get_val('detail', csv_data, res)
+        detail = get_val('detail', csv_data, res) if type(get_val('detail', csv_data, res)) == str else None
         if state or justification or responses or detail:
-            analysis = VulnerabilityAnalysis(state=state, justification=justification, detail=detail, responses=responses)
+            analysis = VulnerabilityAnalysis(
+                state=state, 
+                justification=justification, 
+                detail=detail, responses=responses
+                )
         else:
             analysis = None
         vulnerability.analysis = analysis
