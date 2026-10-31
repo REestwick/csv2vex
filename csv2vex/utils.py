@@ -129,9 +129,7 @@ def read_file(data_file:str) -> tuple[int, pd.DataFrame]:
     elif ext in ['.xls', '.xlsx']:
         data = pd.read_excel(filepath, dtype=str)
         cell_value = data.iat[3, 0]
-        print(cell_value)
         if cell_value == "Subsystem":
-            print("true")
             data.columns = data.iloc[3]
             data = data.drop([0,1,2,3])
             data = data.reset_index(drop=True)
